@@ -21,7 +21,7 @@ contract Statistics is Initializable {
         uint256 noOfInstancesSubmitted_Success;
         uint256 noOfSubmissions_Failed;
     }
-    mapping(address => uint256) internal averageTimeTakenToCompleteLevels;
+    mapping(address => uint256) private averageTimeTakenToCompleteLevels;
     mapping(address => uint256) private globalNoOfLevelsCompletedByPlayer;
     mapping(address => uint256) private globalNoOfInstancesCreatedByPlayer;
     mapping(address => uint256) private globalNoOfInstancesCompletedByPlayer;
@@ -109,17 +109,17 @@ contract Statistics is Initializable {
             globalNoOfLevelsCompletedByPlayer[player]++;
             levelFirstCompletionTime[player][level] = block.timestamp;
         }
-        uint256 memory averageCompletionTimeByPlayer;
-        uint memory globalLevelsSolvedByPlayer;
+        uint256 averageCompletionTimeByPlayer;
+        uint256 globalLevelsSolvedByPlayer;
         playerStats[player][level].timeSubmitted.push(block.timestamp);
         playerStats[player][level].timeCompleted = block.timestamp;
         playerStats[player][level].isCompleted = true;
         levelStats[level].noOfInstancesSubmitted_Success++;
         globalNoOfInstancesCompleted++;
         globalNoOfInstancesCompletedByPlayer[player]++;
-        calculateAverageTimeTakenToCompleteLevelsByPlayer(player, level);
-        averageCompletionTimeByPlayer = averageTimeTakenToCompleteLevels[player];
-        globalLevelsSolvedByPlayer = globalNoOfLevelsCompletedByPlayer[player];
+        updateAverageTimeTakenToCompleteLevelsByPlayer(player, level);
+        averageCompletionTimeByPlayer = getAverageTimeTakenToCompleteLevels(player);
+        globalLevelsSolvedByPlayer = getTotalNoOfLevelsCompletedByPlayer(player);
         emit playerScoreProfile(player, averageCompletionTimeByPlayer, globalLevelsSolvedByPlayer);
     }
 
@@ -269,21 +269,19 @@ contract Statistics is Initializable {
             levels.length;
     }
 
-    // Function to calculate the average time elapsed for all player's completed levels on first successful submission
-    function calculateAverageTimeTakenToCompleteLevelsByPlayer(address player, address level) private returns(uint256) {
-        uint256 lastAverageTime = averageTimeTakenToCompleteLevelsByPlayer[player];
+    // Function to update the average time elapsed for all player's completed levels on first successful submission
+    function updateAverageTimeTakenToCompleteLevelsByPlayer(address player, address level) private {
+        uint256 lastAverageTime = averageTimeTakenToCompleteLevels[player];
         uint256 newAverageTimeTakenToCompleteLevels;
         uint256 timeTakenForThisSuccessfulSubmission;
         timeTakenForThisSuccessfulSubmission = levelFirstCompletionTime[player][level] - levelFirstInstanceCreationTime[player][level];
-
         //now, set the average time value in the mapping via evaluating its current value;
         if (averageTimeTakenToCompleteLevels[player] == 0) {
-        averageTimeTakenToCompleteLevels[player] == timeTakenForThisSuccessfulSubmission;
+            averageTimeTakenToCompleteLevels[player] = timeTakenForThisSuccessfulSubmission;
         } else {
-        newAverageTimeTakenToCompleteLevels = (lastAverageTime + timeTakenForThisSuccessfulSubmission) / 2;
-        averageTimeTakenToCompleteLevelsByPlayer[player] = newAverageTimeTakenToCompleteLevels;
+            newAverageTimeTakenToCompleteLevels = ((lastAverageTime * (getTotalNoOfLevelsCompletedByPlayer(player)-1)) + timeTakenForThisSuccessfulSubmission)/getTotalNoOfLevelsCompletedByPlayer(player);
+            averageTimeTakenToCompleteLevels[player] = newAverageTimeTakenToCompleteLevels;
         }
-        return averageTimeTakenToCompleteLevelsByPlayer[player];
     }
 
     // Game specific metrics
@@ -341,6 +339,10 @@ contract Statistics is Initializable {
 
     function getTotalNoOfEthernautLevels() public view returns(uint256) {
         return levels.length;
+    }
+
+    function getAverageTimeTakenToCompleteLevels(address player) public view returns(uint256) {
+        return averageTimeTakenToCompleteLevels[player];
     }
 
     
