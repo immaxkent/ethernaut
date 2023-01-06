@@ -2,6 +2,7 @@
 @import "./page.css";
 @import "./level.css";
 @import "./hubspot.css";
+@import "./stats.css";
 @import url(https://fonts.googleapis.com/css?family=Lato:100,200,300,400,500,700,400italic,700italic);
 
 /* General */
@@ -71,6 +72,16 @@ ul {
   margin-left: auto;
   margin-right: auto;
   max-width: 90%;
+}
+
+.christmas-hat {
+  color: var(--secondary-color);
+  cursor: pointer;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 80%;
+  margin-top: -15%;
 }
 
 .logo-container {
@@ -328,7 +339,7 @@ nav li {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  bottom: 1px;
+  bottom: 2px;
   right: 1px;
   background: var(--secondary-color);
   font-weight: bold;
@@ -500,6 +511,13 @@ footer {
   display: none;
 }
 
+@media only screen and (max-width: 1029px){
+  :root {
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+}
+
 @media only screen and (max-width: 956px) {
   .toggle {
     display: none;
@@ -512,7 +530,17 @@ footer {
 
 
 @media only screen and (max-width: 885px) {
-  .dropdown {
+  .appcontainer{
+    width: 100vw;
+  }
+  .header-ul{
+    display: flex;
+    margin-right: 20px;
+  }
+  .helpcontainer{
+    width: calc(100vw - 40px);
+  }
+  .header-ul > .dropdown.chains{
     display: none;
   }
 
@@ -538,5 +566,27 @@ footer {
 
   .boxes {
     width: 100%;
+  }
+
+  .source-code {
+    /* add a padding of 40px ;> */
+    width: calc(100vw - 40px);
+  }
+
+  .author-section-border{
+    padding: 0;
+  }
+
+  .author-section {
+    width: 100%;
+    margin: 0;
+  }
+
+  .game {
+    justify-content: center;
+  }
+
+  .the-ethernaut {
+    width: 60%;
   }
 }
